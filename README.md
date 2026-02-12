@@ -1,0 +1,2 @@
+# AIforALL
+Projects for demo
