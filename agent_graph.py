@@ -12,6 +12,14 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 import streamlit as st
 
+from prompts import (
+    SUPERVISOR_PROMPT,
+    WEB_SEARCH_AGENT_PROMPT,
+    MATH_AGENT_PROMPT,
+    PYTHON_AGENT_PROMPT,
+    ML_AGENT_PROMPT
+)
+
 # Initialize Models and Search (can be initialized lazily or globally)
 llm_model = ChatOpenAI(model="gpt-4o")
 tv_search = TavilySearchResults(max_results=5, search_depth='advanced', max_tokens=10000)
@@ -152,42 +160,35 @@ def create_workflow():
         model=llm_model,
         tools=[search_web],
         name="tavily_search",
-        system_prompt="You are a world class researcher with access to web search. Do not do any math or predictions."
+        system_prompt=WEB_SEARCH_AGENT_PROMPT
     )
 
     math_agent = create_agent(
         model=llm_model,
         tools=[add, multiply, subtract],
         name="math_expert",
-        system_prompt="You are a math expert. Always use one tool at a time."
+        system_prompt=MATH_AGENT_PROMPT
     )
 
     coding_agent = create_agent(
         model=llm_model,
         tools=[python_repl],
         name="python_coder",
-        system_prompt="You are a python coding expert. Always use one tool at a time."
+        system_prompt=PYTHON_AGENT_PROMPT
     )
 
     ml_agent = create_agent(
         model=llm_model,
         tools=tools_ml,
         name="ml_expert",
-        system_prompt="You are a machine learning expert in predicting the survival chances of a passenger in titanic. Always use one tool at a time"
+        system_prompt=ML_AGENT_PROMPT
     )
 
     # Supervisor
     workflow = create_supervisor(
         [math_agent, coding_agent, ml_agent, websearch_agent],
         model=llm_model,
-        prompt=(
-            "You are a team supervisor managing a research expert, coding agent, ml expert and a math expert. "
-            "For any predictions, use ml expert. Always use ml_expert for predictions. "
-            "For current events, use tavily_search. "
-            "For math problems, use math_expert. "
-            "For any coding request using python, use python_coder. "
-            "If data is passed from the supervisor use only that, if not generate the code and give the option for user to execute it manually."
-        )
+        prompt=SUPERVISOR_PROMPT
     )
     
     return workflow.compile()

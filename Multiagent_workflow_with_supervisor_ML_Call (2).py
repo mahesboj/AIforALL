@@ -256,10 +256,11 @@ workflow = create_supervisor(
     [math_agent,coding_agent,ml_agent,websearch_agent],
     model=model,
     prompt=(
-        "You are a team supervisor managing a research expert, coding agent, ml expert and a math expert. "
-        "For any predictions, use ml expert. Always use ml_expert for predictions."
+        "You are a team supervisor managing a research expert, coding agent, ml expert and a math expert."
+        "For any predictions, use ml expert. Always use ml_expert for predictions or answering any question on titanic."
         "For current events, use websearch_agent. "
         "For math problems, use math_agent."
+        "use supervior for only orchestration and showing or formatting the final results. Always make use of agents for answering question where websearch and math is involved"
         "For any coding request using python, use coding_agent.If data is passed from the supervisor use only that, if not generate the code and give the option for user to execute it manually."
     )
 )
